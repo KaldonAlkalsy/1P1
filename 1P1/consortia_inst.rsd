@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet1">
+    <Query>
+      <DataSourceReference>main_shared_data_source</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name=":report_level">
+          <DefaultValue>"State"</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>select distinct report_level_code, report_level_description from
+(select
+    'State' as report_level
+    , '1111' as rc_id
+    , '1111' as report_level_code
+    , 'State Total' as report_level_description
+from dual 
+union all
+select distinct
+    'Consortia'
+    , rc_id
+    , cast(consortium_number as varchar2(4)) as report_level_code
+    , consortium_description as report_level_description 
+from isrs.v_st_perkins_v_cohort_summary
+union all
+select distinct
+    'Institution'
+    , rc_id
+    , rc_id as report_level_code
+    , institution_name as report_level_description
+from isrs.v_st_perkins_v_cohort_summary)
+where report_level = :report_level
+order by 2</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="REPORT_LEVEL_CODE">
+        <DataField>REPORT_LEVEL_CODE</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="REPORT_LEVEL_DESCRIPTION">
+        <DataField>REPORT_LEVEL_DESCRIPTION</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

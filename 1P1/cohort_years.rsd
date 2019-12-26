@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet1">
+    <Query>
+      <DataSourceReference>main_shared_data_source</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name=":ConsortiaInstitution">
+          <DefaultValue>=new Object() {"1111", "10", "0203"}</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+          <rd:DbType>String</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>select distinct cohort_years
+from (  select cohort_years
+        from isrs.v_st_perkins_v_cohort_summary
+        where rpt_gender &lt;&gt; 'unknown' and (RC_ID IN (SELECT regexp_substr(:ConsortiaInstitution, '[^,]+', 1, level)
+FROM dual CONNECT BY regexp_substr(:ConsortiaInstitution, '[^,]+', 1, level) IS NOT NULL) 
+OR
+CAST(CONSORTIUM_NUMBER AS varchar2(4)) IN
+(SELECT regexp_substr(:ConsortiaInstitution, '[^,]+', 1, level)
+FROM dual CONNECT BY regexp_substr(:ConsortiaInstitution, '[^,]+', 1, level) IS NOT NULL))
+        union all
+        select cohort_years from isrs.v_st_perkins_v_state_summary where rpt_gender &lt;&gt; 'unknown')
+order by 1 desc</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="COHORT_YEARS">
+        <DataField>COHORT_YEARS</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>
